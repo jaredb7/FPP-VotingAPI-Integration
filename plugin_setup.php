@@ -86,13 +86,13 @@ if (isset($_POST['submit']) || ((isset($_POST['SET_MAIN_PL_NAMES']) || isset($_P
     WriteSettingToFile("SPACER_SEQUENCE", urldecode($_POST["SPACER_SEQUENCE"]), $pluginName);
 
     //Start and end events
-    if (isset($_POST['START_EVENT'])) {
+    if (isset($_POST['START_EVENT']) && strtolower(urldecode($_POST["START_EVENT"])) !== "none" ) {
         WriteSettingToFile("START_EVENT_SET", true, $pluginName);
         WriteSettingToFile("START_EVENT", urldecode($_POST["START_EVENT"]), $pluginName);
     } else {
         WriteSettingToFile("START_EVENT_SET", false, $pluginName);
     }
-    if (isset($_POST['END_EVENT'])) {
+    if (isset($_POST['END_EVENT']) && strtolower(urldecode($_POST["END_EVENT"])) !== "none" ) {
         WriteSettingToFile("END_EVENT_SET", true, $pluginName);
         WriteSettingToFile("END_EVENT", urldecode($_POST["END_EVENT"]), $pluginName);
     } else {
