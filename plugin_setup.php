@@ -607,7 +607,7 @@ if (file_exists($pluginConfigFile)) {
                             $li_list_class = 'list-group-item-success';
                         }
 
-                        if (stripos(($ltd), 'POLLING FPP STATUS') !== false) {
+                        if (stripos(($ltd), 'POLLING FPP STATUS') !== false || stripos(($ltd), 'plugin.php')) {
                             $list_class = 'text-white';
                             $li_list_class = 'list-group-item-primary';
                         }
