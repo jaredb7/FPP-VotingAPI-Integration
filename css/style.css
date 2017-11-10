@@ -1,0 +1,114 @@
+.vote_plugin {
+    font-size: 14px !important;
+}
+
+.buttons {
+    padding-right: 6px !important;
+    padding-left: 6px !important;
+    width: auto !important;
+}
+
+.dynamic_lastUpdated {
+
+}
+
+.playlistOutputTable {
+    border-collapse: collapse;
+}
+
+.tblheader {
+    background-color: #CCC;
+    text-align: center;
+}
+
+.tblheader td {
+    border: 2px solid #888888;
+    text-align: center;
+    font-weight: bold;
+}
+
+tr.rowUniverseDetails {
+    border: thin solid;
+    border-color: #CCC;
+}
+
+tr.rowUniverseDetails td {
+    padding: 1px 5px;
+}
+
+.playlistOutputTable {
+    border: thin;
+    border-color: #333;
+    border-collapse: collapse;
+}
+
+tr.rowGpioDetails {
+    border: thin solid #ccc;
+    font-size: 14px !important;
+}
+
+.log-view-list {
+    width: 100%;
+    height: 420px;
+    overflow-y: scroll;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+}
+
+.list-group-item {
+    list-style: none;
+    word-wrap: break-word;
+}
+
+.list-group-item-success {
+    background-color: #28a745 !important;
+}
+
+.list-group-item-warning {
+    background-color: #ffc107 !important;
+}
+
+.list-group-item-danger {
+    background-color: #dc3545 !important;
+}
+
+.list-group-item-info {
+    background-color: #17a2b8 !important;
+}
+
+.list-group-item-primary {
+    background-color: #007bff !important;
+}
+
+.list-group-item-secondary {
+    background-color: #868e96 !important;
+}
+
+.text-invert {
+    color: #000 !important;
+}
+
+.text-white {
+    color: #fff !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+.text-primary {
+    color: #007bff !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.error-log-legend {
+    padding-left: 6px;
+    padding-right: 6px;
+}
