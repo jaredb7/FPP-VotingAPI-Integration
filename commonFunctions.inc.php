@@ -652,7 +652,6 @@ function checkEventFilesForKey($keyCheckString)
  */
 function getEventFileNameForKey($keyCheckString)
 {
-
     global $eventDirectory;
 
     $keyExist = false;

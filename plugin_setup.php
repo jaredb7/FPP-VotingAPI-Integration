@@ -82,7 +82,23 @@ if (isset($_POST['submit']) || ((isset($_POST['SET_MAIN_PL_NAMES']) || isset($_P
     WriteSettingToFile("API_KEY", urldecode($_POST["API_KEY"]), $pluginName);
     WriteSettingToFile("MAIN_PLAYLIST", urldecode($_POST["MAIN_PLAYLIST"]), $pluginName);
     WriteSettingToFile("SPARE_PLAYLIST", urldecode($_POST["SPARE_PLAYLIST"]), $pluginName);
+    //Spacer sequence
     WriteSettingToFile("SPACER_SEQUENCE", urldecode($_POST["SPACER_SEQUENCE"]), $pluginName);
+
+    //Start and end events
+    if (isset($_POST['START_EVENT'])) {
+        WriteSettingToFile("START_EVENT_SET", true, $pluginName);
+        WriteSettingToFile("START_EVENT", urldecode($_POST["START_EVENT"]), $pluginName);
+    } else {
+        WriteSettingToFile("START_EVENT_SET", false, $pluginName);
+    }
+    if (isset($_POST['END_EVENT'])) {
+        WriteSettingToFile("END_EVENT_SET", true, $pluginName);
+        WriteSettingToFile("END_EVENT", urldecode($_POST["END_EVENT"]), $pluginName);
+    } else {
+        WriteSettingToFile("END_EVENT_SET", false, $pluginName);
+    }
+
     //Control Items
     WriteSettingToFile("MAX_ITEM_REPEATS", urldecode($_POST["MAX_ITEM_REPEATS"]), $pluginName);
     WriteSettingToFile("MAX_ITEM_ROTATIONS", urldecode($_POST["MAX_ITEM_ROTATIONS"]), $pluginName);
@@ -140,6 +156,7 @@ if (isset($_POST['submit']) || ((isset($_POST['SET_MAIN_PL_NAMES']) || isset($_P
     //Backup playlist is a copy of the main playlist
 //    WriteSettingToFile("BACKUP_PLAYLIST", urldecode($_POST["MAIN_PLAYLIST"]), $pluginName);
 }
+
 /**
  * Plugin config file location
  */
@@ -150,6 +167,8 @@ $API_KEY = false;
 $SET_MAIN_PL_NAMES_ADDED = false;
 $MAIN_PLAYLIST = $SPARE_PLAYLIST = $SPACER_SEQUENCE = '';
 $MAIN_PLAYLIST_DATA = $SPARE_PLAYLIST_DATA = array();
+$START_EVENT = $END_EVENT = 'none';
+$START_EVENT_SET = $END_EVENT_SET = false;
 $DYNAMIC_PLAYLIST_DATA = [];//array
 $DYNAMIC_PLAYLIST_LAST_UPDATE = '';
 $MAX_ITEM_REPEATS = $MAX_ITEM_ROTATIONS = 1;
@@ -157,7 +176,7 @@ $MOST_VOTED_RESET = $SPARE_VOTING = $FULLY_DYNAMIC_ONLY = $HIGHEST_VOTED_ONLY = 
 $PLUGIN_LOG_FILE = "/tmp/FPP-VotingAPI-Integration.log";
 
 
-//load settings if plugin settings file exists 
+//load settings if plugin settings file exists
 if (file_exists($pluginConfigFile)) {
     $pluginSettings = parse_ini_file($pluginConfigFile);
 
@@ -175,6 +194,16 @@ if (file_exists($pluginConfigFile)) {
     $SPARE_PLAYLIST_DATA = json_decode(urldecode($pluginSettings['SPARE_PLAYLIST_DATA']), true);
     //Spacer sequence
     $SPACER_SEQUENCE = ($pluginSettings['SPACER_SEQUENCE']);
+
+    //Start / End events
+    $START_EVENT_SET = ($pluginSettings['START_EVENT_SET']);
+    if (isset($pluginSettings['START_EVENT']) && !empty($pluginSettings['START_EVENT'])) {
+        $START_EVENT = ($pluginSettings['START_EVENT']);
+    }
+    $END_EVENT_SET = ($pluginSettings['END_EVENT_SET']);
+    if (isset($pluginSettings['END_EVENT']) && !empty($pluginSettings['END_EVENT'])) {
+        $END_EVENT = ($pluginSettings['END_EVENT']);
+    }
 
     //Backup playlist is a copy of the main playlist
     $BACKUP_PLAYLIST = json_decode(urldecode($pluginSettings['BACKUP_PLAYLIST']), true);
@@ -283,6 +312,9 @@ if (file_exists($pluginConfigFile)) {
                         </li>
                         <li><b>6.</b> Tick "Sync Playlist if to publish the playlist to the Voting Website</li>
                         <li><b>7.</b> Click 'Save Config'</li>
+                        <li><b>8.</b> Go to your scheduled playlist(s) & add the VOTE_CHECK_API event at the beginning
+                            of the playlist (after any "Play first only once" items)
+                        </li>
                     </ul>
                     <p>
 
@@ -348,6 +380,62 @@ if (file_exists($pluginConfigFile)) {
                         }
                         echo "<br><small>(you can opt to reset the reset the votes to 0 for the Popular/Voted sequence if it repeats too many times. <br> In order to give other voted items a chance at getting played)</small>";
                         ?>
+                        <hr>
+                        <h3><em>*Optional* Event Selection</em></h3>
+                        <?
+                        //print event selection dropdown
+                        echo "<b>Select <em><b>START Event</b></em> to play at start of playlist:</b> \n";
+                        echo "<select name=\"START_EVENT\">";
+
+                        //Get list of playlists
+                        $events = retrieveEvents();
+
+                        //Default selection
+                        echo "<option label='NONE' value=\"" . 'NONE' . "\">" . 'NONE' . "</option>";
+
+                        foreach ($events as $event_filename => $event_value) {
+                            $event_name_name = $event_value['name'];
+
+                            //Check to see if the playlist is the selected playlist
+                            if (strtolower($event_filename) == strtolower($START_EVENT)) {
+                                //Print option as selected
+                                echo "<option label='$event_filename' selected value=\"" . $event_filename . "\">" . $event_name_name . "</option>";
+                            } else {
+                                //Print every other option
+                                echo "<option label='$event_filename' value=\"" . $event_filename . "\">" . $event_name_name . "</option>";
+                            }
+                        }
+                        echo "</select>";
+                        echo "<br><small>(this event will be put at the start of the playlist)</small>";
+                        ?>
+                        <br>
+                        <?
+                        //print event selection dropdown
+                        echo "<b>Select <em><b>END Event</b></em> to play at end of playlist:</b> \n";
+                        echo "<select name=\"END_EVENT\">";
+
+                        //Default selection
+                        echo "<option label='NONE' value=\"" . 'NONE' . "\">" . 'NONE' . "</option>";
+
+                        foreach ($events as $event_filename => $event_value) {
+                            $event_name_name = $event_value['name'];
+
+                            //Check to see if the playlist is the selected playlist
+                            if (strtolower($event_filename) == strtolower($END_EVENT)) {
+                                //Print option as selected
+                                echo "<option label='$event_filename' selected value=\"" . $event_filename . "\">" . $event_name_name . "</option>";
+                            } else {
+                                //Print every other option
+                                echo "<option label='$event_filename' value=\"" . $event_filename . "\">" . $event_name_name . "</option>";
+                            }
+                        }
+                        echo "</select>";
+                        echo "<br><small>(this event will be put at the end of the playlist)</small>";
+                        echo "<br><small>(most useful when using Jukebox Mode as we may never return return your schedule playlist, thus never playing any event you may have before the end of the schedule)</small>";
+
+                        ?>
+                        <br>
+                        <br>
                         <hr>
                         <h3><em>Playlist Selection</em></h3>
                         <?
@@ -434,8 +522,6 @@ if (file_exists($pluginConfigFile)) {
                                 } else {
                                     $processed_playlist_item = processPlaylistItemRow($playlist_value);
                                 }
-
-//                    var_dump($processed_playlist_item);
                                 //Make sure the processed playlist item comes back with something
                                 if (!empty($processed_playlist_item)) {
                                     //Print all the input fields
@@ -530,20 +616,11 @@ if (file_exists($pluginConfigFile)) {
                         <td width="5%" align="left">Votes
                         <td width="10%" align="left">Last Updated</td>
                     </tr>
-
                     <?
                     //sudo rm /tmp/FPP.ControllerMonitor.log
                     //Controller List is already an array, lets loop over it and ping each host
                     //loop over each line and extract info
                     foreach ($DYNAMIC_PLAYLIST_DATA as $playlist_item_id => $playlist_item_data) {
-
-//                "name": "wizards in winter-tso",
-//                "data": "b,2015-wizards in winter-tso.fseq,04-Wizards in Winter.mp3,",
-//                "id": "5d00b586222afed97481e4a7395529e770ce6f65",
-//                "pos": 14,
-//                "votes": 66,
-//                "playlist": "main"
-
                         //ID in the list
                         $pl_item_id = $playlist_item_id;
                         //playlist item id, this is the single identifier the API uses to locate this playlist entry
@@ -593,6 +670,7 @@ if (file_exists($pluginConfigFile)) {
         </div>
         <div id="tab-log-view">
             <div class="settings vote_plugin log-view-list">
+                <span>Log output is reverse, with most current entries at the top</span>
                 <?
                 if (file_exists($logFile)) {
                     $log = tail($logFile, 500);
@@ -647,15 +725,15 @@ if (file_exists($pluginConfigFile)) {
             <div>
                 <span><b>Legend:</b></span>
                 <br>
-                <span class="text-white list-group-item-success error-log-legend"><em> Success </em></span>
+                <span class="text-white list-group-item-success error-log-legend"><em>Success</em></span>
                 <br>
-                <span class="text-white list-group-item-primary error-log-legend"><em> Info </em></span>
+                <span class="text-white list-group-item-primary error-log-legend"><em>Info</em></span>
                 <br>
-                <span class="text-white list-group-item-secondary error-log-legend"><em> Callback Info </em></span>
+                <span class="text-white list-group-item-secondary error-log-legend"><em>Callback Info</em></span>
                 <br>
-                <span class="text-invert list-group-item-warning error-log-legend"><em> Warnings </em></span><span>  - Something didn't work - non critical - for information purposes</span>
+                <span class="text-invert list-group-item-warning error-log-legend"><em>Warnings</em></span><span>  - Something didn't work - non critical - for information purposes</span>
                 <br>
-                <span class="text-white list-group-item-danger error-log-legend"><em> Errors </em></span><span>  - Something didn't work - critical</span>
+                <span class="text-white list-group-item-danger error-log-legend"><em>Errors</em></span><span>  - Something didn't work - critical</span>
                 <br>
             </div>
         </div>

@@ -42,6 +42,7 @@ _Configuration_
     5. Optional: Choose a playlist to use as a "spare pool", these are spare sequences you may want run in the display
     6. Tick "Sync Playlist if to publish the playlist to the Voting Website
     7. Click 'Save Config'
+    8. Go to your scheduled playlist(s) & add the VOTE_CHECK_API event at the beginning of the playlisy (after any "Play first only once" items)
 
 **Settings Page**       
 ![Alt text](/images/settings_page.png?raw=true "Settings Page")

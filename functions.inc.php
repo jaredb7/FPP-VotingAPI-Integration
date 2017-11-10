@@ -89,6 +89,7 @@ function getVotedPlaylist()
 function clearPlayedSequences()
 {
     global $pluginName;
+
     writeToConfig('PLAYED_SEQUENCES', urlencode(json_encode(array())), $pluginName);
 }
 
@@ -145,7 +146,17 @@ function createVoted_Playlist($voted_playlist)
             //If w were able to open / get the file resource, then proceed with writing
             if ($f !== FALSE) {
                 //write the playlist header that specifies whether first and/or last item plays once
+                //this hardly matters because we're changing playlists often
                 $entries = sprintf("%s,%s,\n", $first, $last);
+
+                //if there is a start event set, insert it
+                if (isset($settings['START_EVENT_SET']) && isset($settings['START_EVENT']) && $settings['START_EVENT_SET'] == true) {
+                    //insert the event
+                    logEntry("createVoted_Playlist: Inserting START EVENT -- " . $settings['START_EVENT']);
+                    //remove the file extension from the event
+                    $START_EVENT_FILE_NAME = trim(str_ireplace(".fevt", "", $settings['START_EVENT']));
+                    $entries .= sprintf("%s,%s,\n", 'e', $START_EVENT_FILE_NAME);
+                }
 
                 //first item should be the spacer sequence
                 if (isset($settings['SPACER_SEQUENCE']) && !empty($settings['SPACER_SEQUENCE'])) {
@@ -158,6 +169,15 @@ function createVoted_Playlist($voted_playlist)
                 foreach ($playlist_item_data as $pi_idx => $pi_data) {
                     //now write the playlist line, we're supplied with the whole line so put that in
                     $entries .= $pi_data . "\n";
+                }
+
+                //if there is a end event set, insert it
+                if (isset($settings['END_EVENT_SET']) && isset($settings['END_EVENT']) && $settings['END_EVENT_SET'] == true) {
+                    //insert the event
+                    logEntry("createVoted_Playlist: Inserting END EVENT -- " . $settings['END_EVENT']);
+                    //remove the file extension from the event
+                    $END_EVENT_FILE_NAME = trim(str_ireplace(".fevt", "", $settings['END_EVENT']));
+                    $entries .= sprintf("%s,%s,\n", 'e', $END_EVENT_FILE_NAME);
                 }
 
                 //Add the event at the end
@@ -529,6 +549,12 @@ function getPluginSettings()
         //Spacer sequence
         $settings_array['SPACER_SEQUENCE'] = ($pluginSettings['SPACER_SEQUENCE']);
 
+        //Start & End events
+        $settings_array['START_EVENT'] = ($pluginSettings['START_EVENT']);
+        $settings_array['START_EVENT_SET'] = ($pluginSettings['START_EVENT_SET']);
+        $settings_array['END_EVENT_SET'] = ($pluginSettings['END_EVENT_SET']);
+        $settings_array['END_EVENT'] = ($pluginSettings['END_EVENT']);
+
         //Backup playlist is a copy of the main playlist
         $settings_array['BACKUP_PLAYLIST'] = json_decode(urldecode($pluginSettings['BACKUP_PLAYLIST']), true);
         //Dynamic Playlist is the playlist returned from the API,
@@ -685,10 +711,6 @@ function retrievePlaylists()
     //find the plugin configs
     foreach ($playlists as $fname => $fdata) {
         if ((stripos(strtolower($fname), ".json") == false)) {
-            //split the string to get jsut the plugin name
-//            $playlist_name = explode(".", $fname);
-//            $playlist_name = $playlist_name[1];
-//            $playlist_name = str_replace("_"," ",$fname);
             $playlist_name = $fname;
             $playlist_names[$playlist_name] = array('type' => 'file', 'location' => $settings['mediaDirectory'] . "/playlists" . "/" . $fname);
         }
@@ -698,7 +720,7 @@ function retrievePlaylists()
 }
 
 /**
- * Retruns a list of sequences from the sequences directory
+ * Returns a list of sequences from the sequences directory
  *
  * @return array
  */
@@ -712,10 +734,6 @@ function retrieveSequences()
     //find the plugin configs
     foreach ($sequences as $fname => $fdata) {
         if ((stripos(strtolower($fname), ".json") == false)) {
-            //split the string to get jsut the plugin name
-//            $playlist_name = explode(".", $fname);
-//            $playlist_name = $playlist_name[1];
-//            $playlist_name = str_replace("_"," ",$fname);
             $sequence_name = $fname;
             $sequence_names[$sequence_name] = array('type' => 'file', 'location' => $settings['sequenceDirectory'] . "/" . $fname);
         }
@@ -724,6 +742,40 @@ function retrieveSequences()
     return $sequence_names;
 }
 
+/**
+ * Returns a list of events
+ *
+ * @return array
+ */
+function retrieveEvents()
+{
+    global $settings, $eventDirectory;
+    //Read events from the event directory
+    $events = read_directory_files($eventDirectory, false);
+    $event_names = array();
+
+    //Get the event file for this plugin so we can exclude itr
+    $event_for_plugin = getEventFileNameForKey("VOTE_CHECK_API");
+
+    //find the plugin configs
+    foreach ($events as $fname => $fdata) {
+        if ((stripos(strtolower($fname), ".json") == false)) {
+            if (strtolower($event_for_plugin) !== strtolower($fname)) {
+                $event_content_name = "";
+                //try get the name of the event
+                $event_data = parse_ini_file($eventDirectory . "/" . $fname);
+                if (!empty($event_data)) {
+                    $event_content_name = $event_data['name'];
+                }
+
+                $event_name = $fname;
+                $event_names[$event_name] = array('type' => 'file', 'name' => $event_content_name, 'location' => $eventDirectory . "/" . $fname);
+            }
+        }
+    }
+
+    return $event_names;
+}
 
 /**
  * Returns a contents of the specified playlist
