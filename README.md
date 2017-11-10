@@ -11,8 +11,8 @@ Configuration:
 
 If you experience show stoppage, disable this plugin and report the issue on either ACL or below.
 
-To report a bug, please file it against the FPP-VotingAPI-Integrationplugin project on Git: https://github.com/jaredb7/FPP-VotingAPI-Integration.git 
-or Add to my Trello Board
+To report a bug, please file it against the FPP-VotingAPI-Integration plugin project on Git: https://github.com/jaredb7/FPP-VotingAPI-Integration.git 
+or Add to my Trello Board https://trello.com/b/G5VbDFuQ/displays-near-me-public
 
 **A note on FPP & this implementation**
 
