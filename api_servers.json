@@ -1,0 +1,10 @@
+[
+  {
+    "_id": "Production",
+    "server": "http://christmaslightsnear.me/api/"
+  },
+  {
+    "_id": "Development",
+    "server": "http://dev.christmaslightsnear.me/api/"
+  }
+]
