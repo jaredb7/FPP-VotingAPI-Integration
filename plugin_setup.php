@@ -86,13 +86,13 @@ if (isset($_POST['submit']) || ((isset($_POST['SET_MAIN_PL_NAMES']) || isset($_P
     WriteSettingToFile("SPACER_SEQUENCE", urldecode($_POST["SPACER_SEQUENCE"]), $pluginName);
 
     //Start and end events
-    if (isset($_POST['START_EVENT']) && strtolower(urldecode($_POST["START_EVENT"])) !== "none" ) {
+    if (isset($_POST['START_EVENT']) && strtolower(urldecode($_POST["START_EVENT"])) !== "none") {
         WriteSettingToFile("START_EVENT_SET", true, $pluginName);
         WriteSettingToFile("START_EVENT", urldecode($_POST["START_EVENT"]), $pluginName);
     } else {
         WriteSettingToFile("START_EVENT_SET", false, $pluginName);
     }
-    if (isset($_POST['END_EVENT']) && strtolower(urldecode($_POST["END_EVENT"])) !== "none" ) {
+    if (isset($_POST['END_EVENT']) && strtolower(urldecode($_POST["END_EVENT"])) !== "none") {
         WriteSettingToFile("END_EVENT_SET", true, $pluginName);
         WriteSettingToFile("END_EVENT", urldecode($_POST["END_EVENT"]), $pluginName);
     } else {
@@ -173,8 +173,7 @@ $DYNAMIC_PLAYLIST_DATA = [];//array
 $DYNAMIC_PLAYLIST_LAST_UPDATE = '';
 $MAX_ITEM_REPEATS = $MAX_ITEM_ROTATIONS = 1;
 $MOST_VOTED_RESET = $SPARE_VOTING = $FULLY_DYNAMIC_ONLY = $HIGHEST_VOTED_ONLY = 'OFF';
-$PLUGIN_LOG_FILE = "/tmp/FPP-VotingAPI-Integration.log";
-
+$PLUGIN_LOG_FILE = $logFile;
 
 //load settings if plugin settings file exists
 if (file_exists($pluginConfigFile)) {
@@ -235,6 +234,13 @@ if (file_exists($pluginConfigFile)) {
 
     //Dynamic Playlist Upate Sequence Number -- used to track if there were any updates to the playlist checked against the API value, if changed, pull down a new playlist
 //    $DYNAMIC_PLAYLIST_USN = $pluginSettings['DYNAMIC_PLAYLIST_USN'];
+}
+
+//If we are in MOST_VOTED mode and this page loads, then get the dynamic playlist from the web server
+//this isn't retrieved during processing (only most voted item is)
+//this is just so the user can see the playlist under Playlist Viewer as it is on the server
+if (isset($HIGHEST_VOTED_ONLY) && strtolower($HIGHEST_VOTED_ONLY) == "on") {
+    getVotedPlaylist();
 }
 ?>
 <html>

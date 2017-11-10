@@ -14,7 +14,7 @@ If you experience show stoppage, disable this plugin and report the issue on eit
 To report a bug, please file it against the FPP-VotingAPI-Integration plugin project on Git: https://github.com/jaredb7/FPP-VotingAPI-Integration.git 
 or Add to my Trello Board https://trello.com/b/G5VbDFuQ/displays-near-me-public
 
-**A note on FPP & this implementation**
+**A note on FPP and this implementation**
 
 FPP in it's current form does not give me a way to to programmatically change playlists easily.
 We can tell FPP to Play a playlist, but this can't be done if it's currently running a playlist.. if that makes sense?
@@ -27,8 +27,9 @@ After that has run (finished), FPPD will switch to your schedule. Whether this i
 
 **Description**
 
-This plugin enables viewers to vote on playlist / sequence items in your display via a publicly accessible website @ ChristmasDisplaysNear.Me
-Known Issues:
+This plugin enables viewers to vote on playlist / sequence items in your display via a publicly accessible website @ ChristmasLightsNear.Me
+
+**Known Issues**
 
 May Cause funky issues with plugins that make use of the postStart and postStop callbacks, due to starting and stopping of FPPD
 Things to note:
