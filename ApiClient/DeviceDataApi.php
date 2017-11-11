@@ -184,7 +184,7 @@ class DeviceDataApi
      *
      * @param $playlistOptions
      * @param $playlistData
-     * @param string $playlistType
+     * @param string $playlistType main | both [main + spare]
      * @return null
      */
     public function upload($playlistOptions, $playlistData, $playlistType = "main")
@@ -200,8 +200,10 @@ class DeviceDataApi
         $body['options'] = $playlistOptions;
         if ($playlistType == "main") {
             $body['main'] = $playlistData;
-        } elseif ($playlistType == "spare") {
-            $body['spare'] = $playlistData;
+        } elseif ($playlistType == "both") {
+            //handle both main and spare playlist upload in the same call
+            $body['main'] = $playlistData['main'];
+            $body['spare'] = $playlistData['spare'];
         }
 
         //make the API Call

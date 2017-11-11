@@ -453,27 +453,35 @@ function uploadPlaylist()
 
     //get the spare playlist data if spare voting
     if (isset($settings['SPARE_VOTING']) && strtolower($settings['SPARE_VOTING']) == 'on') {
-        $playlist_data['spare'] = $settings['MAIN_PLAYLIST_DATA'];
+        $playlist_data['spare'] = $settings['SPARE_PLAYLIST_DATA'];
     }
 
     //If we have playlist data... well at least the main playlist, we can upload it
-    if (isset($playlist_data['main']) && isset($playlist_options)) {
+    if (isset($playlist_data['main']) && !isset($playlist_data['spare']) && isset($playlist_options)) {
         //Main playlist upload
         //make the call
-        logEntry("Sending spare playlist data to api: " . json_encode(array('options' => $playlist_options, 'main' => $playlist_data['main'])));
-
+        logEntry("Sending main playlist data to api: " . json_encode(array('options' => $playlist_options, 'main' => $playlist_data['main'])));
+        //just send the main playlist
         $playlist_upload_api = $_apiClient->upload($playlist_options, $playlist_data['main'], 'main');
-    } elseif (isset($playlist_data['spare']) && isset($playlist_options)) {
-        //Spare playlist upload
+    } //if we have both the main and spare playlists set
+    elseif (isset($playlist_data['main']) && isset($playlist_data['spare']) && isset($playlist_options)) {
+        //Main + Spare playlist upload
         //make the call
-        logEntry("Sending main playlist data to api: " . json_encode(array('options' => $playlist_options, 'spare' => $playlist_data['spare'])));
-
-        $playlist_upload_api = $_apiClient->upload($playlist_options, $playlist_data['main'], 'spare');
+        logEntry("Sending both main+spare playlist data to api: " . json_encode(array('options' => $playlist_options, 'main' => $playlist_data['main'], 'spare' => $playlist_data['spare'])));
+        //send both playlists
+        $playlist_upload_api = $_apiClient->upload($playlist_options, $playlist_data, 'both');
     }
 
     //From the response we want the playlist_main data, we'll store it as the dynamic playlist
     if (isset($playlist_upload_api['data']['device_data'])) {
+        //get the main playlist by default
         $dynamic_playlist_data = $playlist_upload_api['data']['device_data']['playlist_main'];
+
+        //if the spare playlist is also not null & spare voting was set
+        if (isset($playlist_upload_api['data']['device_data']['playlist_spare']) && strtolower($settings['SPARE_VOTING']) == 'on') {
+            $dynamic_playlist_data = array_merge($playlist_upload_api['data']['device_data']['playlist_main'], $playlist_upload_api['data']['device_data']['playlist_spare']);
+        }
+
         persistDynamicPlaylist($dynamic_playlist_data);
     }
 }

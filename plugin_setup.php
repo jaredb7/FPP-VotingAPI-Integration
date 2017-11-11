@@ -1,6 +1,6 @@
 <?php
-//error_reporting(E_ALL);
-//ini_set('display_errors', 1);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 //"/opt/fpp/www/common.php";
 include_once("functions.inc.php");
@@ -122,18 +122,18 @@ if (isset($_POST['submit']) || ((isset($_POST['SET_MAIN_PL_NAMES']) || isset($_P
         if ($_MAIN_PL_NAMES_COUNT > 0) {
             //Then we want to find all the input fields, with names and data
             $_MAIN_PL_NAMES_ARRAY = array();
-            for ($pi = 0; $pi < $_MAIN_PL_NAMES_COUNT; $pi++) {
+            for ($m_pi = 0; $m_pi < $_MAIN_PL_NAMES_COUNT; $m_pi++) {
                 //playlist_main_item_name_$loop_count
                 //playlist_main_item_data_$loop_count
 
                 //try to find the playlist items name and data
-                $_field_playlist_name = "playlist_main_item_name_" . $pi;
-                $_field_playlist_data = "playlist_main_item_data_" . $pi;
+                $_m_field_playlist_name = "playlist_main_item_name_" . $m_pi;
+                $_m_field_playlist_data = "playlist_main_item_data_" . $m_pi;
                 //Check the post fields actually exist, then get the data
-                if (isset($_POST[$_field_playlist_name]) && isset($_POST[$_field_playlist_data])) {
-                    $_MAIN_PL_NAMES_ARRAY[$pi] = array(
-                        "name" => urldecode($_POST[$_field_playlist_name]),
-                        "data" => urldecode($_POST[$_field_playlist_data])
+                if (isset($_POST[$_m_field_playlist_name]) && isset($_POST[$_m_field_playlist_data])) {
+                    $_MAIN_PL_NAMES_ARRAY[$m_pi] = array(
+                        "name" => urldecode($_POST[$_m_field_playlist_name]),
+                        "data" => urldecode($_POST[$_m_field_playlist_data])
                     );
                 }
             }
@@ -142,6 +142,36 @@ if (isset($_POST['submit']) || ((isset($_POST['SET_MAIN_PL_NAMES']) || isset($_P
             //once done, write our the playlist names array to the config file
             WriteSettingToFile("MAIN_PLAYLIST_DATA", urlencode(json_encode($_MAIN_PL_NAMES_ARRAY)), $pluginName);
             WriteSettingToFile("SET_MAIN_PL_NAMES_ADDED", true, $pluginName);
+        }
+    }
+    ///Capture the spare_playlist item names if this specific hidden field exists, but only on submit
+     if (isset($_POST['SET_SPARE_PL_NAMES_COUNT']) && isset($_POST['submit'])) {
+        $_SPARE_PL_NAMES_COUNT = $_POST['SET_SPARE_PL_NAMES_COUNT'];
+        //double check
+        if ($_SPARE_PL_NAMES_COUNT > 0) {
+            //Then we want to find all the input fields, with names and data
+            $_SPARE_PL_NAMES_ARRAY = array();
+            for ($s_pi = 0; $s_pi < $_SPARE_PL_NAMES_COUNT; $s_pi++) {
+                //playlist_spare_item_name_$loop_count
+                //playlist_spare_item_data_$loop_count
+
+                //try to find the playlist items name and data
+
+                $_s_field_playlist_name = "playlist_spare_item_name_" . $s_pi;
+                $_s_field_playlist_data = "playlist_spare_item_data_" . $s_pi;
+                //Check the post fields actually exist, then get the data
+                if (isset($_POST[$_s_field_playlist_name]) && isset($_POST[$_s_field_playlist_data])) {
+                    $_SPARE_PL_NAMES_ARRAY[$s_pi] = array(
+                        "name" => urldecode($_POST[$_s_field_playlist_name]),
+                        "data" => urldecode($_POST[$_s_field_playlist_data])
+                    );
+                }
+            }
+            //Fix the indexes
+            $_SPARE_PL_NAMES_ARRAY = array_values($_SPARE_PL_NAMES_ARRAY);
+            //once done, write our the playlist names array to the config file
+            WriteSettingToFile("SPARE_PLAYLIST_DATA", urlencode(json_encode($_SPARE_PL_NAMES_ARRAY)), $pluginName);
+            WriteSettingToFile("SET_SPARE_PL_NAMES_ADDED", true, $pluginName);
         }
     }
 
@@ -165,6 +195,7 @@ $pluginConfigFile = $settings['configDirectory'] . "/plugin." . $pluginName;
 //Set defaults
 $API_KEY = false;
 $SET_MAIN_PL_NAMES_ADDED = false;
+$SET_SPARE_PL_NAMES_ADDED = false;
 $MAIN_PLAYLIST = $SPARE_PLAYLIST = $SPACER_SEQUENCE = '';
 $MAIN_PLAYLIST_DATA = $SPARE_PLAYLIST_DATA = array();
 $START_EVENT = $END_EVENT = 'none';
@@ -508,8 +539,8 @@ if (isset($HIGHEST_VOTED_ONLY) && strtolower($HIGHEST_VOTED_ONLY) == "on") {
                                 echo "<b>You've previously set names for your sequences! attempting to show what was entered:</b><br>";
                             }
 
-                            echo "<b>Enter some friendly names for your sequences (this is shown to your visitors):</b><br>";
-                            //If names have previousl been given to the playlist items then try swap in the main playlist data and display existing values
+                            echo "<b>Enter some friendly names for your sequences (these are shown to your visitors):</b><br>";
+                            //If names have previously been given to the playlist items then try swap in the main playlist data and display existing values
                             if ($SET_MAIN_PL_NAMES_ADDED == true) {
                                 $playlist_list_main_data = $MAIN_PLAYLIST_DATA;
                             } else {
@@ -588,6 +619,49 @@ if (isset($HIGHEST_VOTED_ONLY) && strtolower($HIGHEST_VOTED_ONLY) == "on") {
                         <br>
                         <small>(Click this button to give playlist items names)</small>
                         <br>
+                        <br>
+                        <?
+                        //if the set SET_SPARE_PL_NAMES button was clicked, it will trigger $SET_MAIN_PL_NAMES to true in the $_POST check
+                        if ($SET_SPARE_PL_NAMES == true || $SET_SPARE_PL_NAMES_ADDED == true) {
+                            //If the playlist names have already been added then print a message saying
+                            if ($SET_SPARE_PL_NAMES_ADDED == true) {
+                                echo "<b>You've previously set names for your spare sequences! attempting to show what was entered:</b><br>";
+                            }
+
+                            echo "<b>Enter some friendly names for your spare sequences (these are shown to your visitors):</b><br>";
+                            //If names have previously been given to the playlist items then try swap in the main playlist data and display existing values
+                            if ($SET_SPARE_PL_NAMES_ADDED == true) {
+                                $playlist_list_spare_data = $SPARE_PLAYLIST_DATA;
+                            } else {
+                                //Get list of playlists
+                                $playlist_list_spare_data = retrievePlaylistContents($SPARE_PLAYLIST)[$SPARE_PLAYLIST];
+                                $playlist_list_spare_data = $playlist_list_spare_data['data'];
+                            }
+
+                            //track each input field
+                            $loop_count = 0;
+                            foreach ($playlist_list_spare_data as $spare_playlist_item_id => $spare_playlist_value) {
+                                //Process the item returning an array with name and data
+                                //change the data location - used in conjunction with $SET_MAIN_PL_NAMES_ADDED above
+                                if (is_array($spare_playlist_value) && array_key_exists('data', $spare_playlist_value) && $SET_SPARE_PL_NAMES_ADDED == true) {
+                                    $processed_playlist_item = $spare_playlist_value;
+                                } else {
+                                    $processed_playlist_item = processPlaylistItemRow($spare_playlist_value);
+                                }
+                                //Make sure the processed playlist item comes back with something
+                                if (!empty($processed_playlist_item)) {
+                                    //Print all the input fields
+                                    echo "<input type='text' name='playlist_spare_item_name_$loop_count' size=\"56\" value=\"" . $processed_playlist_item['name'] . "\">";
+                                    echo "<input type='text' name='playlist_spare_item_data_$loop_count' hidden value=\"" . $processed_playlist_item['data'] . "\">";
+                                    echo "<br>";
+                                    //incr count
+                                    $loop_count++;
+                                }
+                            }
+                            //number of input fields generated, this is incredibly important so we can get all user supplied sequence names
+                            echo "<input type='text' hidden name=\"SET_SPARE_PL_NAMES_COUNT\" value='$loop_count'>";
+                        }
+                        ?>
                         <hr>
                         <b>Sync Playlist?:</b>
                         <input type='checkbox' id='SYNC_PLAYLIST' name="SYNC_PLAYLIST"/>
