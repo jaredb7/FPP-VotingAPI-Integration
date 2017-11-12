@@ -544,7 +544,7 @@ function getPluginSettings()
             $settings_array['API_SERVER'] = urldecode($pluginSettings['API_SERVER']);
         } else {
             //default to production if not set
-            $settings_array['API_SERVER'] = "http://christmaslightsnear.me/api/";
+            $settings_array['API_SERVER'] = "http://prod.christmaslightsnear.me/api/";
         }
         //Playlists -- all JSON encoded
         $settings_array['MAIN_PLAYLIST'] = ($pluginSettings['MAIN_PLAYLIST']);

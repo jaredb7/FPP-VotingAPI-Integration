@@ -216,6 +216,8 @@ if (file_exists($pluginConfigFile)) {
     $API_KEY = $pluginSettings['API_KEY'];
     if (isset($pluginSettings['API_SERVER']) && !empty($pluginSettings['API_SERVER'])) {
         $API_SERVER = $pluginSettings['API_SERVER'];
+    }else{
+        $API_SERVER = "http://prod.christmaslightsnear.me/api/";
     }
     //Playlists -- all JSON encoded
     $MAIN_PLAYLIST = ($pluginSettings['MAIN_PLAYLIST']);
