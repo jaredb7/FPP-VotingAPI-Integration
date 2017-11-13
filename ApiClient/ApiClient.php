@@ -157,7 +157,7 @@ class APIClient
         } else if ($response_info['http_code'] == 200) {
             $data = json_decode($response, true);
         } else if ($response_info['http_code'] == 400) {
-            throw new Exception("Bad Request: " . json_decode($response) . " " . $url . " : response code: " . $response_info['http_code']);
+            throw new Exception("Bad Request: " . ($response) . " -- " . $url . " : response code: " . $response_info['http_code']);
         } else if ($response_info['http_code'] == 401) {
             throw new Exception("Unauthorized API request to " . $url . " : Invalid Login Credentials");
         } else if ($response_info['http_code'] == 403) {
@@ -166,7 +166,7 @@ class APIClient
             $data = null;
             throw new Exception("Not Found : " . $url);
         } else if ($response_info['http_code'] == 500) {
-            throw new Exception("Internal server error, response code: " . $response_info['http_code']);
+            throw new Exception("Internal server error, response code: " . $response_info['http_code'] . " -- " . $response);
         } else {
             throw new Exception("Can't connect to the api: " . $url . " : response code: " . $response_info['http_code']);
         }
