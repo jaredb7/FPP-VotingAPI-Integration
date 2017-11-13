@@ -36,14 +36,14 @@ Things to note:
 
 _Configuration_
 
-    1. Enable Plugin
-    2. Enter API Key (Visit https://christmasdisplaysnear.me & Signup + Create your display & Device entry (copy your Device Key from Step 3.)
+    1. Enable Plugin        
+    2. Enter API Key (Visit https://christmaslightsnear.me & Signup + Create your display & Add Device entry (copy your Device Key from Step 3. or Dashboard -> Devices))
     3. Choose the playlist you wish to use for voting (this would normally be your scheduled playlist)
     4. Choose the spacer sequence (required for Jukebox mode)
     5. Optional: Choose a playlist to use as a "spare pool", these are spare sequences you may want run in the display
-    6. Tick "Sync Playlist if to publish the playlist to the Voting Website
+    6. Tick "Sync Playlist" to publish the playlist to the Voting Website
     7. Click 'Save Config'
-    8. Go to your scheduled playlist(s) & add the VOTE_CHECK_API event at the beginning of the playlisy (after any "Play first only once" items)
+    8. Go to your scheduled playlist(s) & add the VOTE_CHECK_API event at the beginning of the playlist (after any "Play first only once" items)            
 
 **Settings Page**       
 ![Alt text](/images/settings_page.png?raw=true "Settings Page")
