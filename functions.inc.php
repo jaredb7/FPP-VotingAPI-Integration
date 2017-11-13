@@ -437,7 +437,7 @@ function uploadPlaylist()
     $_apiClient = new DeviceDataApi($settings['API_SERVER'], $settings['API_KEY']);
 
     $playlist_options = array();
-    $dynamic_playlist_data = $playlist_data = array();
+    $playlist_upload_api = $dynamic_playlist_data = $playlist_data = array();
 
     //Build the playlist options up based on what our selected settings here
     if (!empty($settings['FULLY_DYNAMIC_ONLY']) && strtolower($settings['FULLY_DYNAMIC_ONLY']) == "on") {
@@ -476,6 +476,8 @@ function uploadPlaylist()
     if (isset($playlist_upload_api['data']['device_data'])) {
         //get the main playlist by default
         $dynamic_playlist_data = $playlist_upload_api['data']['device_data']['playlist_main'];
+
+        logEntry("Playlist upload successful: " . json_encode($dynamic_playlist_data));
 
         //if the spare playlist is also not null & spare voting was set
         if (isset($playlist_upload_api['data']['device_data']['playlist_spare']) && strtolower($settings['SPARE_VOTING']) == 'on') {
@@ -544,7 +546,14 @@ function getPluginSettings()
             $settings_array['API_SERVER'] = urldecode($pluginSettings['API_SERVER']);
         } else {
             //default to production if not set
-            $settings_array['API_SERVER'] = "http://prod.christmaslightsnear.me/api/";
+            $api_servers = getApiServers('production');
+
+            //try set the default server to production from the environment file
+            if (array_key_exists('server', $api_servers)) {
+                $settings_array['API_SERVER'] = $api_servers['server'];
+            } else {
+                $settings_array['API_SERVER'] = "http://prod.christmaslightsnear.me/api/";
+            }
         }
         //Playlists -- all JSON encoded
         $settings_array['MAIN_PLAYLIST'] = ($pluginSettings['MAIN_PLAYLIST']);

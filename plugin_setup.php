@@ -30,6 +30,14 @@ $pluginUpdateFile = $settings['pluginDirectory'] . "/" . $pluginName . "/" . "pl
  * Plugin Logfile
  */
 $logFile = $settings['logDirectory'] . "/" . $pluginName . ".log";
+/**
+ * Website URL
+ */
+$siteUrl = "https://ChristmasLightsNear.Me";
+/**
+ * Default Production API endpoint
+ */
+$defaultProdApi = "http://prod.christmaslightsnear.me/api/";
 
 //Log what our plugin update file is
 //logEntry("Plugin update file: " . $pluginUpdateFile);
@@ -43,7 +51,7 @@ if (isset($_POST['updatePlugin'])) {
 }
 
 //API server
-$API_SERVER = "http://christmaslightsnear.me/api";
+$API_SERVER = "http://prod.christmaslightsnear.me/api/";
 //Defaults
 $SET_MAIN_PL_NAMES = false;
 $RESET_MAIN_PL_NAMES = false;
@@ -217,7 +225,7 @@ if (file_exists($pluginConfigFile)) {
     if (isset($pluginSettings['API_SERVER']) && !empty($pluginSettings['API_SERVER'])) {
         $API_SERVER = $pluginSettings['API_SERVER'];
     }else{
-        $API_SERVER = "http://prod.christmaslightsnear.me/api/";
+        $API_SERVER = $defaultProdApi;
     }
     //Playlists -- all JSON encoded
     $MAIN_PLAYLIST = ($pluginSettings['MAIN_PLAYLIST']);
@@ -291,10 +299,10 @@ if (isset($HIGHEST_VOTED_ONLY) && strtolower($HIGHEST_VOTED_ONLY) == "on") {
         <div id="tab-plugin-settings">
             <div class="settings vote_plugin">
                 <fieldset>
-                    <legend>ChristmasDisplaysNear.Me Voting API Support Instructions (v<? echo $pluginVersion ?>)
+                    <legend>ChristmasLightsNear.Me Voting API Support Instructions (v<? echo $pluginVersion ?>)
                     </legend>
                     <span>This plugin enables viewers to vote on playlist / sequence items in your display via a publicly
-            accessible website @ <a href="https://ChristmasDisplaysNear.Me">ChristmasDisplaysNear.Me</a></span>
+            accessible website @ <a href="<?echo $siteUrl;?>">ChristmasLightsNear.Me</a></span>
 
                     <p>Known Issues:
                     <ul>
@@ -334,10 +342,8 @@ if (isset($HIGHEST_VOTED_ONLY) && strtolower($HIGHEST_VOTED_ONLY) == "on") {
                     <ul>
                         <li><b>1.</b> Enable Plugin
                         </li>
-                        <li><b>2.</b> Enter API Key (Visit https://christmasdisplaysnear.me & Signup + Create your
-                            display &
-                            Device
-                            entry (copy your Device Key from Step 3.)
+                        <li><b>2.</b> Enter API Key (Visit <a href="<?echo $siteUrl;?>"><?echo $siteUrl;?></a> & Signup + Create your
+                            display & Device entry (copy your Device Key from Step 3. or Dashboard -> Devices))
                         </li>
                         <li><b>3.</b> Choose the playlist you wish to use for voting (this would normally be your
                             scheduled
@@ -762,7 +768,10 @@ if (isset($HIGHEST_VOTED_ONLY) && strtolower($HIGHEST_VOTED_ONLY) == "on") {
                         $li_list_class = 'list-group-item-info';
                         $list_class = 'text-white';
 
-                        if (stripos(($ltd), 'PLAY PLAYLIST') !== false || stripos(($ltd), 'FPP is idle') !== false || stripos(($ltd), 'Playlist Started') !== false) {
+                        if (stripos(($ltd), 'PLAY PLAYLIST') !== false ||
+                            stripos(($ltd), 'FPP is idle') !== false ||
+                            stripos(($ltd), 'Playlist Started') !== false ||
+                            stripos(($ltd), 'Success') !== false) {
                             $list_class = 'text-white';
                             $li_list_class = 'list-group-item-success';
                         }

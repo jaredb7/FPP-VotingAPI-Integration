@@ -30,17 +30,28 @@ function updatePluginFromGitHub($gitURL, $branch = "master", $pluginName)
 /**
  * Returns a list of API servers from the api_servers.json file
  */
-function getApiServers()
+function getApiServers($env)
 {
     global $settings, $pluginName;
 
-    $api_server_json_path = $settings['pluginDirectory'] ."/" . $pluginName . "/api_servers.json";
+    $api_server_json_path = $settings['pluginDirectory'] . "/" . $pluginName . "/api_servers.json";
     $api_server_json_contents_arr = array();
 
     if (file_exists($api_server_json_path)) {
         $api_server_json_contents = file_get_contents($api_server_json_path);
         if (isset($api_server_json_contents) && !empty($api_server_json_contents)) {
-            $api_server_json_contents_arr = json_decode($api_server_json_contents,true);
+            $api_server_json_contents_arr = json_decode($api_server_json_contents, true);
+            //if a environment has been supplied, then try to return the server for that environment
+            if (isset($env) && !empty($env)) {
+                foreach ($api_server_json_contents_arr as $id => $server) {
+                    //if the server id matches the supplied environment, break and return only that environment
+                    if (strtolower($server['_id']) == strtolower($env)) {
+                        return $server;
+                        break;
+                    }
+                }
+            }
+
             return $api_server_json_contents_arr;
         }
     }
