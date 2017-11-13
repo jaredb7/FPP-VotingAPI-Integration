@@ -798,7 +798,7 @@ if (isset($HIGHEST_VOTED_ONLY) && strtolower($HIGHEST_VOTED_ONLY) == "on") {
                         }
 
                         //remove the plugin location from the output text
-                        $ltd = str_ireplace("/home/fpp/media/plugins/FPP-VotingAPI-Integration/", "", $ltd);
+                        $ltd = str_ireplace(": /home/fpp/media/plugins/FPP-VotingAPI-Integration/", "", $ltd);
 
                         //Remove warning and error prefixes
                         $ltd = str_replace("ERROR :: ", "", $ltd);
