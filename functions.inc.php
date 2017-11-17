@@ -180,21 +180,21 @@ function createVoted_Playlist($voted_playlist)
                     $entries .= sprintf("%s,%s,\n", 'e', $END_EVENT_FILE_NAME);
                 }
 
-                //Add the event at the end
-                if ($event_added == false) {
-                    //Find if the event exists already, returned value is true/false
-                    $EVENT_FILE_NAME = getEventFileNameForKey("VOTE_CHECK_API");
-                    //remove the file event file extension
-                    $EVENT_FILE_NAME = trim(str_ireplace(".fevt", "", $EVENT_FILE_NAME));
-                    if (isset($EVENT_FILE_NAME) && !empty($EVENT_FILE_NAME)) {
-                        logEntry("createVoted_Playlist: Adding VOTE_CHECK_API event - " . $EVENT_FILE_NAME);
-                        //add the event file. eg e,01_05,
-                        $entries .= sprintf("%s,%s,\n", 'e', $EVENT_FILE_NAME);
-                        $event_added = true;
-                    } else {
-                        logEntry("createVoted_Playlist: Could note find VOTE_CHECK_API event");
-                    }
-                }
+//                //Add the event at the end
+//                if ($event_added == false) {
+//                    //Find if the event exists already, returned value is true/false
+//                    $EVENT_FILE_NAME = getEventFileNameForKey("VOTE_CHECK_API");
+//                    //remove the file event file extension
+//                    $EVENT_FILE_NAME = trim(str_ireplace(".fevt", "", $EVENT_FILE_NAME));
+//                    if (isset($EVENT_FILE_NAME) && !empty($EVENT_FILE_NAME)) {
+//                        logEntry("createVoted_Playlist: Adding VOTE_CHECK_API event - " . $EVENT_FILE_NAME);
+//                        //add the event file. eg e,01_05,
+//                        $entries .= sprintf("%s,%s,\n", 'e', $EVENT_FILE_NAME);
+//                        $event_added = true;
+//                    } else {
+//                        logEntry("createVoted_Playlist: Could note find VOTE_CHECK_API event");
+//                    }
+//                }
 
                 //Write the file out
                 $written = fwrite($f, $entries);
@@ -355,12 +355,12 @@ function syncPlaylists()
     if (strtolower($fppMode) == "master") {
         if (isset($settings['MultiSyncRemotes']) && !empty($settings['MultiSyncRemotes'])) {
             $remotes = explode(',', $settings['MultiSyncRemotes']);
-
+            //if we have remotes
             if (!empty($remotes)) {
                 foreach ($remotes as $remote_id => $remote_ip) {
                     $command = "rsync -av --stats $fppHome/media/$dir/ $remote_ip::media/$dir/ 2>&1";
                     $command_result = exec($command);
-                    logEntry("syncPlaylists: Attempt Sync Playlists to (" . $remote_ip . ") : Result: " . $command_result);
+                    logEntry("syncPlaylists: Attempt Sync Playlists to (" . $remote_ip . ") -- Result: " . $command_result);
                 }
             }
         }
